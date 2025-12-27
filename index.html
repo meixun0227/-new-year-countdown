@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026新年倒计时</title>
+    <style>
+        :root {
+            --primary-color: #ff7eb9;
+            --secondary-color: #ff758c;
+            --accent-color: #ffcc00;
+            --glow-color: rgba(255, 126, 185, 0.6);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2a0b45, #d4145a);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            touch-action: manipulation;
+        }
+        
+        /* 电影辉光效果 - 移动端优化 */
+        .glow-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                var(--glow-color) 0%,
+                transparent 70%
+            );
+            opacity: 0.5;
+            z-index: -1;
+            animation: glowPulse 8s infinite alternate;
+        }
+        
+        @keyframes glowPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+        }
+        
+        /* 光晕效果 - 移动端优化 */
+        .halo {
+            position: absolute;
+            width: 200vw;
+            height: 200vh;
+            background: radial-gradient(
+                circle at center,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 70%
+            );
+            z-index: -2;
+            animation: haloRotate 60s linear infinite;
+        }
+        
+        @keyframes haloRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(1px);
+        }
+        
+        /* 容器优化 - 移动端适配 */
+        .container {
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 126, 185, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: glow 3s infinite alternate;
+            width: 95%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 126, 185, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 117, 140, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(255, 204, 0, 0.6);
+            }
+        }
+        
+        /* 标题优化 - 移动端 */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 5s ease infinite;
+            background-size: 200% auto;
+            padding: 0 10px;
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% center;
+            }
+            50% {
+                background-position: 100% center;
+            }
+            100% {
+                background-position: 0% center;
+            }
+        }
+        
+        /* 倒计时模块 - 移动端优化 */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .countdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 70px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+        }
+        
+        /* 倒计时数字 - 移动端 */
+        .countdown-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* 倒计时标签 - 移动端 */
+        .countdown-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 消息文本 - 移动端 */
+        .message {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            opacity: 0;
+            transition: opacity 1s;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding: 0 10px;
+        }
+        
+        /* 新年祝福 - 移动端 */
+        .new-year {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px var(--accent-color);
+            color: var(--accent-color);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 1s ease-out;
+            background: linear-gradient(45deg, #ff8a00, #ff0058, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 3s ease infinite;
+            background-size: 200% auto;
+            padding: 0 10px;
+        }
+        
+        .show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* 祝福语区域 - 移动端 */
+        .blessings {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 2s;
+            padding: 0 15px;
+        }
+        
+        .blessing-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin: 0.8rem 0;
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 90%;
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 1s ease-out;
+        }
+        
+        .blessing-text:nth-child(1) {
+            transition-delay: 0.5s;
+        }
+        
+        .blessing-text:nth-child(2) {
+            transition-delay: 1.5s;
+        }
+        
+        .show-blessings .blessing-text {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .show-blessings {
+            opacity: 1;
+        }
+        
+        /* 媒体查询 - 平板及以上设备 */
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .countdown-item {
+                min-width: 100px;
+                padding: 1.5rem;
+            }
+            
+            .countdown-number {
+                font-size: 3rem;
+            }
+            
+            .countdown-label {
+                font-size: 1rem;
+            }
+            
+            .message {
+                font-size: 1.5rem;
+            }
+            
+            .new-year {
+                font-size: 4rem;
+            }
+            
+            .blessing-text {
+                font-size: 1.8rem;
+                line-height: 1.6;
+                margin: 1rem 0;
+                padding: 1rem 2rem;
+                max-width: 80%;
+            }
+        }
+        
+        /* 高级烟花效果 */
+        .firework-rocket {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: rocketLaunch 1s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+            opacity: 0;
+            filter: drop-shadow(0 0 6px currentColor);
+            z-index: 10;
+        }
+        
+        @keyframes rocketLaunch {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            30% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(var(--ty)) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .firework-explosion {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fireworkExplode 1s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+            opacity: 0;
+            z-index: 9;
+        }
+        
+        @keyframes fireworkExplode {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                width: var(--size);
+                height: var(--size);
+                transform: translate(-50%, -50%);
+                opacity: 0;
+            }
+        }
+        
+        .firework-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleSpread 1.5s ease-out forwards;
+            opacity: 0;
+            filter: drop-shadow(0 0 4px currentColor);
+        }
+        
+        @keyframes particleSpread {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .firework-spark {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkTrail 1.2s linear forwards;
+            opacity: 0;
+            filter: blur(1px);
+        }
+        
+        @keyframes sparkTrail {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+                width: 4px;
+                height: 4px;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+                width: 1px;
+                height: 1px;
+            }
+        }
+        
+        .firework-glow {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: glowExpand 2s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+            opacity: 0;
+            filter: blur(15px) brightness(1.5);
+        }
+        
+        @keyframes glowExpand {
+            0% {
+                transform: scale(0);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(3.5);
+                opacity: 0;
+            }
+        }
+        
+        .firework-ring {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            border: 2px solid;
+            pointer-events: none;
+            animation: ringExpand 1.5s ease-out forwards;
+            opacity: 0;
+            filter: blur(2px);
+        }
+        
+        @keyframes ringExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            100% {
+                width: var(--ring-size);
+                height: var(--ring-size);
+                transform: translate(-50%, -50%);
+                opacity: 0;
+            }
+        }
+        
+        .firework-comet {
+            position: absolute;
+            width: 8px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, currentColor);
+            pointer-events: none;
+            animation: cometTrail 1s ease-out forwards;
+            opacity: 0;
+            filter: blur(2px);
+            transform-origin: left center;
+        }
+        
+        @keyframes cometTrail {
+            0% {
+                transform: rotate(var(--angle)) translate(0, 0) scaleX(1);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(var(--angle)) translate(var(--tx), var(--ty)) scaleX(0.1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="halo"></div>
+    <div class="glow-overlay"></div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>距离2026年还有</h1>
+        <div class="countdown">
+            <div class="countdown-item">
+                <div class="countdown-number" id="days">00</div>
+                <div class="countdown-label">天</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="hours">00</div>
+                <div class="countdown-label">小时</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="minutes">00</div>
+                <div class="countdown-label">分钟</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="seconds">00</div>
+                <div class="countdown-label">秒</div>
+            </div>
+        </div>
+        <div class="message" id="message">准备迎接2026年！</div>
+        <div class="new-year" id="new-year">2026新年快乐！</div>
+    </div>
+    
+    <div class="blessings" id="blessings">
+        <div class="blessing-text">跨年的钟声敲响，愿你往后的日子，平安顺遂，有良人相伴，有梦想可追，岁岁皆欢愉，年年皆胜意</div>
+        <div class="blessing-text">旧岁千般皆如意，新年万事定称心。愿新的一年，三餐四季，温柔有趣，我们都要越来越好。</div>
+    </div>
+
+    <script>
+        // 创建粒子背景 - 移动端优化
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                
+                const colors = [
+                    'rgba(255,126,185,0.7)',
+                    'rgba(255,117,140,0.6)',
+                    'rgba(255,255,255,0.5)',
+                    'rgba(255,204,0,0.6)'
+                ];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                const duration = Math.random() * 10 + 5;
+                particle.style.animation = `float ${duration}s ease-in-out infinite`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% {
+                        transform: translateY(0) translateX(0) rotate(0deg);
+                    }
+                    25% {
+                        transform: translateY(-20px) translateX(10px) rotate(10deg);
+                    }
+                    50% {
+                        transform: translateY(0) translateX(20px) rotate(0deg);
+                    }
+                    75% {
+                        transform: translateY(20px) translateX(10px) rotate(-10deg);
+                    }
+                    100% {
+                        transform: translateY(0) translateX(0) rotate(0deg);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 设置目标日期为2026年1月1日 00:00:00
+        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+        
+        // 更新倒计时
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.querySelector('.countdown').style.display = 'none';
+                document.querySelector('h1').textContent = '欢迎来到2026年！';
+                document.getElementById('message').style.opacity = '1';
+                document.getElementById('new-year').classList.add('show');
+                document.getElementById('blessings').classList.add('show-blessings');
+                createFireworks();
+            }
+        }
+        
+        // 高级烟花效果
+        function createFireworks() {
+            const colorPalettes = [
+                // 彩虹渐变
+                ['#FF0000', '#FF3300', '#FF6600', '#FF9900', '#FFCC00', '#FFFF00'],
+                // 粉色系
+                ['#FF007F', '#FF33A6', '#FF66CC', '#FF99E6', '#FFCCF2', '#FFE6F7'],
+                // 蓝色系
+                ['#0066FF', '#0080FF', '#0099FF', '#00BFFF', '#00E6FF', '#1AE5FF'],
+                // 紫色系
+                ['#6600CC', '#7F00FF', '#9933FF', '#B366FF', '#CC99FF', '#E6CCFF'],
+                // 霓虹色
+                ['#00FF00', '#00FF66', '#00FFCC', '#00FFFF', '#0066FF', '#6600FF'],
+                // 金属色
+                ['#FFD700', '#FFEC8B', '#FFF68F', '#FFFACD', '#FFFFE0', '#FAFAD2']
+            ];
+            
+            const fireworkCount = 40;
+            
+            for (let i = 0; i < fireworkCount; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * 80 + 10;
+                    const y = Math.random() * 60 + 20;
+                    const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+                    const mainColor = palette[Math.floor(Math.random() * palette.length)];
+                    const explosionSize = Math.random() * 300 + 200;
+                    
+                    // 创建火箭
+                    const rocket = document.createElement('div');
+                    rocket.className = 'firework-rocket';
+                    rocket.style.left = `${x}vw`;
+                    rocket.style.top = `100vh`;
+                    rocket.style.color = mainColor;
+                    rocket.style.setProperty('--ty', `-${Math.random() * 60 + 40}vh`);
+                    document.body.appendChild(rocket);
+                    
+                    // 火箭到达后创建爆炸
+                    setTimeout(() => {
+                        // 主爆炸
+                        const explosion = document.createElement('div');
+                        explosion.className = 'firework-explosion';
+                        explosion.style.left = `${x}vw`;
+                        explosion.style.top = `${y}vh`;
+                        explosion.style.color = mainColor;
+                        explosion.style.backgroundColor = mainColor;
+                        explosion.style.setProperty('--size', `${explosionSize}px`);
+                        document.body.appendChild(explosion);
+                        
+                        // 光晕效果
+                        const glow = document.createElement('div');
+                        glow.className = 'firework-glow';
+                        glow.style.left = `${x}vw`;
+                        glow.style.top = `${y}vh`;
+                        glow.style.backgroundColor = mainColor;
+                        document.body.appendChild(glow);
+                        
+                        // 爆炸环
+                        for (let r = 0; r < 3; r++) {
+                            setTimeout(() => {
+                                const ring = document.createElement('div');
+                                ring.className = 'firework-ring';
+                                ring.style.left = `${x}vw`;
+                                ring.style.top = `${y}vh`;
+                                ring.style.borderColor = palette[Math.floor(Math.random() * palette.length)];
+                                ring.style.setProperty('--ring-size', `${explosionSize + r * 100}px`);
+                                document.body.appendChild(ring);
+                                
+                                setTimeout(() => ring.remove(), 1500);
+                            }, r * 200);
+                        }
+                        
+                        // 爆炸粒子
+                        const particleCount = 50;
+                        for (let j = 0; j < particleCount; j++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const distance = Math.random() * 150 + 100;
+                            const tx = Math.cos(angle) * distance;
+                            const ty = Math.sin(angle) * distance;
+                            const particleColor = palette[Math.floor(Math.random() * palette.length)];
+                            
+                            const particle = document.createElement('div');
+                            particle.className = 'firework-particle';
+                            particle.style.left = `${x}vw`;
+                            particle.style.top = `${y}vh`;
+                            particle.style.color = particleColor;
+                            particle.style.backgroundColor = particleColor;
+                            particle.style.setProperty('--tx', `${tx}px`);
+                            particle.style.setProperty('--ty', `${ty}px`);
+                            particle.style.animationDelay = `${Math.random() * 0.3}s`;
+                            document.body.appendChild(particle);
+                            
+                            // 粒子尾部
+                            if (Math.random() > 0.7) {
+                                const comet = document.createElement('div');
+                                comet.className = 'firework-comet';
+                                comet.style.left = `${x}vw`;
+                                comet.style.top = `${y}vh`;
+                                comet.style.color = particleColor;
+                                comet.style.setProperty('--angle', `${angle}rad`);
+                                comet.style.setProperty('--tx', `${tx * 0.7}px`);
+                                comet.style.setProperty('--ty', `${ty * 0.7}px`);
+                                document.body.appendChild(comet);
+                                setTimeout(() => comet.remove(), 1000);
+                            }
+                            
+                            setTimeout(() => particle.remove(), 1500);
+                        }
+                        
+                        // 火花轨迹
+                        const sparkCount = 30;
+                        for (let k = 0; k < sparkCount; k++) {
+                            const spark = document.createElement('div');
+                            spark.className = 'firework-spark';
+                            spark.style.left = `${x}vw`;
+                            spark.style.top = `${y}vh`;
+                            spark.style.color = palette[Math.floor(Math.random() * palette.length)];
+                            spark.style.backgroundColor = spark.style.color;
+                            spark.style.setProperty('--tx', `${Math.random() * 80 - 40}px`);
+                            spark.style.setProperty('--ty', `${Math.random() * 80 - 40}px`);
+                            spark.style.animationDelay = `${Math.random() * 0.2}s`;
+                            document.body.appendChild(spark);
+                            
+                            setTimeout(() => spark.remove(), 1200);
+                        }
+                        
+                        setTimeout(() => {
+                            explosion.remove();
+                            glow.remove();
+                        }, 1500);
+                        
+                    }, 1000);
+                    
+                    setTimeout(() => rocket.remove(), 1000);
+                }, i * 500);
+            }
+        }
+        
+        // 每秒更新一次倒计时
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        
+        // 初始化
+        createParticles();
+        updateCountdown();
+        
+        // 处理移动端触摸事件
+        document.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
